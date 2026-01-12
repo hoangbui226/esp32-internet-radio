@@ -1,14 +1,11 @@
 #pragma once
-
-extern const int STATION_COUNT;
+#include <Arduino.h>
 
 struct Station {
   const char* name;
   const char* url;
 };
 
-Station stations[] = {
-  {"VOV1", "https://stream.vovmedia.vn/vov1"},
-  {"VOV Giao Thong", "https://play.vovgiaothong.vn/live/gthn/playlist.m3u8"},
-  {"QNTV", "https://live.baoquangninh.vn/qtvlive/qnr2.m3u8"}
-};
+int stations_count();
+const Station& station_get(int idx);
+int station_wrap_index(int idx);

@@ -1,18 +1,24 @@
+#include "radio_station.h"
 
+static Station stations[] = {
+  {"SomaFM Groove Salad", "http://ice1.somafm.com/groovesalad-128-mp3"},
+  {"SomaFM Drone Zone",   "http://ice1.somafm.com/dronezone-128-mp3"},
+  {"BBC World Service",   "http://stream.live.vc.bbcmedia.co.uk/bbc_world_service"}
+};
 
-Audio audio;
-STATION_COUNT = sizeof(stations)/sizeof(stations[0]);
-stationIndex = 0;
+int stations_count() {
+  return (int)(sizeof(stations) / sizeof(stations[0]));
+}
 
-void startStation(int idx) {
-  if (idx < 0) idx = STATION_COUNT - 1;
-  if (idx >= STATION_COUNT) idx = 0;
-  stationIndex = idx;
+int station_wrap_index(int idx) {
+  const int n = stations_count();
+  if (n <= 0) return 0;
+  while (idx < 0) idx += n;
+  while (idx >= n) idx -= n;
+  return idx;
+}
 
-  metaTitle = "";
-  audio.stopSong();
-  delay(100);
-
-  audio.connecttohost(stations[stationIndex].url);
-  drawUI("Connecting...");
+const Station& station_get(int idx) {
+  idx = station_wrap_index(idx);
+  return stations[idx];
 }

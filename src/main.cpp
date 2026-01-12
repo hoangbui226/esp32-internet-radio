@@ -1,63 +1,72 @@
-#include <WiFi.h>
-#include <Wire.h>
+#include <Arduino.h>
+#include "app_config.h"
+#include "app_state.h"
 
+#include "wifi_manager.h"
+#include "oled_ui.h"
+#include "media_player.h"
+#include "volume_updater.h"
+#include "radio_station.h"
+
+static bool prevNextState = true;
+static bool prevPrevState = true;
+
+static void buttons_init() {
+  pinMode(BTN_NEXT, INPUT_PULLUP);
+  pinMode(BTN_PREV, INPUT_PULLUP);
+}
+
+static void adc_init() {
+  analogReadResolution(12);
+  analogSetAttenuation(ADC_11db);
+}
 
 void setup() {
   Serial.begin(115200);
 
-  pinMode(BTN_NEXT, INPUT_PULLUP);
-  pinMode(BTN_PREV, INPUT_PULLUP);
+  buttons_init();
+  adc_init();
 
-  // ADC config (helps stability on many ESP32 boards)
-  analogReadResolution(12);            // 0..4095
-  analogSetAttenuation(ADC_11db);      // better range up to ~3.3V
-
-  Wire.begin(I2C_SDA, I2C_SCL);
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+  if (!oled_ui_init()) {
     Serial.println("OLED init failed");
-  } else {
-    display.clearDisplay();
-    display.display();
   }
 
-  drawUI("Booting...");
-  connectWiFi();
-  drawUI((WiFi.status() == WL_CONNECTED) ? "WiFi connected" : "WiFi failed");
+  oled_ui_draw("Booting...");
 
-  // Audio init
-  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  wifi_connect_blocking(15000);
+  oled_ui_draw(wifi_is_connected() ? "WiFi connected" : "WiFi failed");
 
-  // Initialize volume from pot immediately
-  potFiltered = analogRead(POT_PIN);
-  updateVolumeFromPot();
+  media_player_init();
 
-  startStation(stationIndex);
+  volume_init_from_pot();
+
+  media_player_start_station(stationIndex);
+  oled_ui_draw("Connecting...");
 }
 
-bool prevNextState = true;
-bool prevPrevState = true;
-
 void loop() {
-  audio.loop();              // must be called frequently
-  updateVolumeFromPot();     // pot -> volume
+  media_player_loop();
+  volume_update_from_pot();
 
-  // Buttons edge-detect
-  bool nextState = digitalRead(BTN_NEXT);
-  bool prevState = digitalRead(BTN_PREV);
+  // Buttons edge detect
+  const bool nextState = digitalRead(BTN_NEXT);
+  const bool prevState = digitalRead(BTN_PREV);
 
   if (prevNextState == HIGH && nextState == LOW) {
-    startStation(stationIndex + 1);
+    media_player_start_station(stationIndex + 1);
+    oled_ui_draw("Connecting...");
   }
   if (prevPrevState == HIGH && prevState == LOW) {
-    startStation(stationIndex - 1);
+    media_player_start_station(stationIndex - 1);
+    oled_ui_draw("Connecting...");
   }
 
   prevNextState = nextState;
   prevPrevState = prevState;
 
   // UI refresh
-  if (millis() - lastUiMs > 200) {
+  if (millis() - lastUiMs > UI_REFRESH_MS) {
     lastUiMs = millis();
-    drawUI("Playing...");
+    oled_ui_draw("Playing...");
   }
 }

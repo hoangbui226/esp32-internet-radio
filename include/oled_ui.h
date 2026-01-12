@@ -1,7 +1,5 @@
 #pragma once
-#include <Adafruit_SSD1306.h>
+#include <Arduino.h>
 
-extern unsigned long lastUiMs;
-extern Adafruit_SSD1306 display;
-
-void drawUI(const char* statusLine);
+bool oled_ui_init();
+void oled_ui_draw(const char* statusLine);

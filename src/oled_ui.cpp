@@ -1,13 +1,22 @@
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <WiFi.h>
 #include "app_config.h"
-#include "volume_updater.h"
+#include "app_state.h"
+#include "radio_station.h"
+#include "oled_ui.h"
 
-static unsigned long lastUiMs = 0;
+bool oled_ui_init() {
+  Wire.begin(I2C_SDA, I2C_SCL);
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+    return false;
+  }
 
-void drawUI(const char* statusLine) {
+  display.clearDisplay();
+  display.display();
+  return true;
+}
+
+void oled_ui_draw(const char* statusLine) {
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
 
@@ -22,7 +31,7 @@ void drawUI(const char* statusLine) {
 
   display.setCursor(0, 22);
   display.print("Station: ");
-  display.println(stations[stationIndex].name);
+  display.println(station_get(stationIndex).name);
 
   display.setCursor(0, 34);
   display.print("Vol: ");

@@ -1,38 +1,33 @@
-#include "volume_updater.h"
-#include <Arduino.h>
+#include <math.h>
 #include "app_config.h"
-#include "Audio.h"
+#include "app_state.h"
+#include "volume_updater.h"
 
-static const int VOL_MIN = 0;
-static const int VOL_MAX = 21;
+static int map_pot_to_volume(float pot) {
+  int mapped = (int)lroundf((pot / 4095.0f) * (VOL_MAX - VOL_MIN) + VOL_MIN);
+  if (mapped < VOL_MIN) mapped = VOL_MIN;
+  if (mapped > VOL_MAX) mapped = VOL_MAX;
+  return mapped;
+}
 
-static int volumeLevel = 10;
-static int lastAppliedVolume = -1;
+void volume_init_from_pot() {
+  potFiltered = (float)analogRead(POT_PIN);
+  lastAppliedVolume = -1;
+  volume_update_from_pot();
+}
 
-static unsigned long lastVolReadMs = 0;
-
-static float potFiltered = 0.0f;
-/* Map & apply volume with hysteresis to avoid flicker */
-void updateVolumeFromPot() {
-  // Read pot at ~20-50 Hz (enough for volume)
-  if (millis() - lastVolReadMs < 30) return;
+void volume_update_from_pot() {
+  if (millis() - lastVolReadMs < POT_READ_MS) return;
   lastVolReadMs = millis();
 
-  int raw = analogRead(POT_PIN); // ESP32 ADC: typically 0..4095
+  const int raw = analogRead(POT_PIN);
 
-  // Low-pass filter (smooth)
-  // alpha 0.15-0.25 is fine
+  // Low-pass filter
   const float alpha = 0.20f;
-  potFiltered = (potFiltered == 0.0f) ? raw : (alpha * raw + (1.0f - alpha) * potFiltered);
+  potFiltered = (potFiltered == 0.0f) ? (float)raw : (alpha * (float)raw + (1.0f - alpha) * potFiltered);
 
-  // Map to volume range
-  int mappedVol = (int)lroundf((potFiltered / 4095.0f) * (VOL_MAX - VOL_MIN) + VOL_MIN);
+  const int mappedVol = map_pot_to_volume(potFiltered);
 
-  // Clamp
-  if (mappedVol < VOL_MIN) mappedVol = VOL_MIN;
-  if (mappedVol > VOL_MAX) mappedVol = VOL_MAX;
-
-  // Apply only if changed by at least 1 step
   if (mappedVol != lastAppliedVolume) {
     lastAppliedVolume = mappedVol;
     volumeLevel = mappedVol;

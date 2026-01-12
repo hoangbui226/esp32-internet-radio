@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-extern String metaTitle;
+void media_player_init();
+void media_player_loop();
 
-void audio_showstreamtitle(const char *info);
+void media_player_start_station(int idx); //wraps index internally
