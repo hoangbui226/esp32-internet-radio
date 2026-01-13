@@ -16,20 +16,48 @@ bool oled_ui_init() {
   return true;
 }
 
-void oled_ui_draw(const char* statusLine) {
+void oled_ui_draw_status(const char* statusLine) {
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
-
   display.setTextSize(1);
+
+  display.setCursor(30, 20);
+  display.println(statusLine ? statusLine : "N/A");
+  display.display();  
+}
+
+void oled_ui_draw_wifi(bool wifiState) {
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+
+  if (wifiState == true)
+  {
+    display.setCursor(0, 18);
+    display.print("WiFi: Connected !");
+
+    display.setCursor(0, 30);
+    display.print("IP: ");
+    display.print(WiFi.localIP().toString());
+    display.display();
+    delay(10000);
+  } else {
+    display.setCursor(0, 18);
+    display.print("WiFi: Failed !");
+
+    display.setCursor(0, 30);
+    display.print("IP: N/A");
+    display.display();
+    delay(1000000);
+  }
+}
+
+void oled_ui_draw_info() {
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+
   display.setCursor(0, 0);
-  display.print("WiFi: ");
-  display.println((WiFi.status() == WL_CONNECTED) ? "OK" : "DOWN");
-
-  display.setCursor(0, 10);
-  display.print("IP: ");
-  display.println(WiFi.localIP());
-
-  display.setCursor(0, 22);
   display.print("Station: ");
   display.println(station_get(stationIndex).name);
 
@@ -38,10 +66,7 @@ void oled_ui_draw(const char* statusLine) {
   display.print(volumeLevel);
   display.print("/");
   display.println(VOL_MAX);
-
-  display.setCursor(0, 46);
-  display.println(statusLine ? statusLine : "");
-
+  
   display.setCursor(0, 56);
   if (metaTitle.length() > 0) {
     String t = metaTitle;
@@ -50,6 +75,5 @@ void oled_ui_draw(const char* statusLine) {
   } else {
     display.print("No metadata");
   }
-
   display.display();
 }

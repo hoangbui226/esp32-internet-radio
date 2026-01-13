@@ -17,12 +17,13 @@ static void buttons_init() {
 }
 
 static void adc_init() {
-  analogReadResolution(12);
+  analogReadResolution(12); // 12 bit resolution
   analogSetAttenuation(ADC_11db);
 }
 
 void setup() {
   Serial.begin(115200);
+  delay(5000);
 
   buttons_init();
   adc_init();
@@ -31,22 +32,26 @@ void setup() {
     Serial.println("OLED init failed");
   }
 
-  oled_ui_draw("Booting...");
+  oled_ui_draw_status("Booting...");
 
-  wifi_connect_blocking(15000);
-  oled_ui_draw(wifi_is_connected() ? "WiFi connected" : "WiFi failed");
+  // Connect to WiFi
+  Serial.println("Connecting to WiFi...");
+  bool isWifiConnected = wifi_connect_blocking(15000); // Wifi connect, 15ms timeout
+  Serial.println(isWifiConnected ? "WiFi connected" : "WiFi connection failed");
+  Serial.println("IP: ");
+  Serial.println(WiFi.localIP());
+  oled_ui_draw_wifi(isWifiConnected);
 
   media_player_init();
-
-  volume_init_from_pot();
+  volume_init();
 
   media_player_start_station(stationIndex);
-  oled_ui_draw("Connecting...");
+  oled_ui_draw_status("Connecting...");
 }
 
 void loop() {
   media_player_loop();
-  volume_update_from_pot();
+  volume_update();
 
   // Buttons edge detect
   const bool nextState = digitalRead(BTN_NEXT);
@@ -54,11 +59,11 @@ void loop() {
 
   if (prevNextState == HIGH && nextState == LOW) {
     media_player_start_station(stationIndex + 1);
-    oled_ui_draw("Connecting...");
+    oled_ui_draw_status("Connecting...");
   }
   if (prevPrevState == HIGH && prevState == LOW) {
     media_player_start_station(stationIndex - 1);
-    oled_ui_draw("Connecting...");
+    oled_ui_draw_status("Connecting...");
   }
 
   prevNextState = nextState;
@@ -67,6 +72,6 @@ void loop() {
   // UI refresh
   if (millis() - lastUiMs > UI_REFRESH_MS) {
     lastUiMs = millis();
-    oled_ui_draw("Playing...");
+    oled_ui_draw_info();
   }
 }

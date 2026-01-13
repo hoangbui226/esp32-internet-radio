@@ -10,13 +10,13 @@ static int map_pot_to_volume(float pot) {
   return mapped;
 }
 
-void volume_init_from_pot() {
+void volume_init() {
   potFiltered = (float)analogRead(POT_PIN);
   lastAppliedVolume = -1;
-  volume_update_from_pot();
+  volume_update();
 }
 
-void volume_update_from_pot() {
+void volume_update() {
   if (millis() - lastVolReadMs < POT_READ_MS) return;
   lastVolReadMs = millis();
 
@@ -24,13 +24,15 @@ void volume_update_from_pot() {
 
   // Low-pass filter
   const float alpha = 0.20f;
-  potFiltered = (potFiltered == 0.0f) ? (float)raw : (alpha * (float)raw + (1.0f - alpha) * potFiltered);
 
+  /* set potFiltered value to raw then use EMA to smooth out volume  */
+  potFiltered = (potFiltered == 0.0f) ? (float)raw : (alpha * (float)raw + (1.0f - alpha) * potFiltered); // EMA filter
+  
   const int mappedVol = map_pot_to_volume(potFiltered);
 
   if (mappedVol != lastAppliedVolume) {
     lastAppliedVolume = mappedVol;
     volumeLevel = mappedVol;
-    audio.setVolume(volumeLevel);
+    audio.setVolume(volumeLevel/5); // changed to match volume range
   }
 }
