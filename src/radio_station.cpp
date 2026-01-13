@@ -1,11 +1,14 @@
 #include "radio_station.h"
 
 static Station stations[] = {
-  {"SomaFM Groove Salad", "http://ice1.somafm.com/groovesalad-128-mp3"},
-  {"SomaFM Drone Zone",   "http://ice1.somafm.com/dronezone-128-mp3"},
-  {"BBC World Service",   "http://stream.live.vc.bbcmedia.co.uk/bbc_world_service"}
+  {"VOV Giao Thong",                "https://play.vovgiaothong.vn/live/gthn/playlist.m3u8"},
+  {"VOH FM Nhip Song 77",           "https://strm.voh.com.vn/radio/channel5/playlist.m3u8"},
+  {"RFI Tieng Viet",                "https://rfienvietnamien64k.ice.infomaniak.ch/rfienvietnamien-64.mp3"},
+  {"Vietnamese National People",    "https://c13.radioboss.fm:8127/autodj"},
+  {"VOH AM Nong Thon",              "https://strm.voh.com.vn/radio/channel2/playlist.m3u8"},
+  {"VOH FM Dem Thanh Pho",          "https://strm.voh.com.vn/radio/channel1/playlist.m3u8"},
+  {"VOH FM Khong Gioi Han",         "https://strm.voh.com.vn/radio/channel3/playlist.m3u8"},
 };
-
 int stations_count() {
   return (int)(sizeof(stations) / sizeof(stations[0]));
 }

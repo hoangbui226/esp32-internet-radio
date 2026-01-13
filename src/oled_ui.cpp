@@ -40,7 +40,7 @@ void oled_ui_draw_wifi(bool wifiState) {
     display.print("IP: ");
     display.print(WiFi.localIP().toString());
     display.display();
-    delay(10000);
+    delay(3000);
   } else {
     display.setCursor(0, 18);
     display.print("WiFi: Failed !");
@@ -67,13 +67,11 @@ void oled_ui_draw_info() {
   display.print("/");
   display.println(VOL_MAX);
   
-  display.setCursor(0, 56);
+  display.setCursor(0, 48);
   if (metaTitle.length() > 0) {
-    String t = metaTitle;
-    if (t.length() > 21) t = t.substring(0, 21) + "...";
-    display.print(t);
+    display.print(metaTitle);
   } else {
-    display.print("No metadata");
+    display.print("No data");
   }
   display.display();
 }
