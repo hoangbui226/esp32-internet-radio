@@ -2,8 +2,8 @@
 
 static Station stations[] = {
   {"VOV Giao Thong",                "https://play.vovgiaothong.vn/live/gthn/playlist.m3u8"},
-  {"VOH FM Nhip Song 77",           "https://strm.voh.com.vn/radio/channel5/playlist.m3u8"},
   {"RFI Tieng Viet",                "https://rfienvietnamien64k.ice.infomaniak.ch/rfienvietnamien-64.mp3"},
+  {"VOH FM Nhip Song 77",           "https://strm.voh.com.vn/radio/channel5/playlist.m3u8"},
   {"Vietnamese National People",    "https://c13.radioboss.fm:8127/autodj"},
   {"VOH AM Nong Thon",              "https://strm.voh.com.vn/radio/channel2/playlist.m3u8"},
   {"VOH FM Dem Thanh Pho",          "https://strm.voh.com.vn/radio/channel1/playlist.m3u8"},
