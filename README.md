@@ -80,7 +80,7 @@ A **potentiometer** is used for real-time volume control, and **2 push-buttons**
 ## ▶ Demo
 ![Demo](docs/demo.gif)
 
-![Video](https://drive.google.com/file/d/18DW2iATCPoD3E4HLxZwOBGMjboKH-xKg/view?usp=sharing)
+https://github.com/hoangbui226/esp32-internet-radio/blob/main/docs/demo.mp4
 ---
 
 ### Run (PlatformIO)
